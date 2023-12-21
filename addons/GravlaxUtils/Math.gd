@@ -1,5 +1,4 @@
-class_name GRXMath extends Node
-
+class_name GRXMath
 
 static func Normalizef(number : float, lowerBound : float, upperBound : float, minNum : float, maxNum : float) -> float:
 	return minNum + (number - lowerBound) * (maxNum - minNum) / (upperBound - lowerBound)
