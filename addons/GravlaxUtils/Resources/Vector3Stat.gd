@@ -24,30 +24,23 @@ func ModScalar(key : String, value : float, precentage : bool) -> void:
 
 func CalcValue(args : Array[String]) -> Vector3:
 	var finalValue : Vector3 = CalcRawValue(args)
-	
-	if UseMinValue == true && UseMaxValue == true:
-		return min(max(finalValue, MinValue), MaxValue)
-	elif UseMaxValue == true:
-		return min(finalValue, MaxValue)
-	elif UseMinValue == true:
-		return max(finalValue, MinValue)
-	else:
-		return finalValue
+	if UseMinValue:
+		finalValue = max(finalValue, MinValue)
+	if UseMaxValue:
+		finalValue = min(finalValue, MaxValue)
+	return finalValue
 
 func CalcRawValue(args : Array[String]) -> Vector3:
 	var addValue : Vector3 = Vector3.ZERO
-	
-	for modifierKey : String in modifiers.keys():
-		if modifierKey in args:
-			continue
-		
-		if modifiers[modifierKey][1] == false:
-			addValue += modifiers[modifierKey][0]
-	
-	var finalValue : Vector3 = BaseValue + addValue
-	
+	var finalMultiplier : Vector3 = Vector3.ONE
+
 	for modifierKey in modifiers.keys():
-		if modifiers[modifierKey][1] == true:
-			finalValue *= Vector3.ONE + modifiers[modifierKey][0]
-	
-	return finalValue
+		var modifierData = modifiers[modifierKey]
+		
+		if modifierKey not in args:
+			if not modifierData[1]:
+				addValue += modifierData[0]
+			else:
+				finalMultiplier *= Vector3.ONE + modifierData[0]
+
+	return (BaseValue + addValue) * finalMultiplier

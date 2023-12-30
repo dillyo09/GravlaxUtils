@@ -21,30 +21,23 @@ func Mod(key : String, value : float, precentage : bool) -> void:
 
 func CalcValue(args : Array[String]) -> float:
 	var finalValue : int = CalcRawValue(args)
-	
-	if UseMinValue == true && UseMaxValue == true:
-		return min(max(finalValue, MinValue), MaxValue)
-	elif UseMaxValue == true:
-		return min(finalValue, MaxValue)
-	elif UseMinValue == true:
-		return max(finalValue, MinValue)
-	else:
-		return finalValue
+	if UseMinValue:
+		finalValue = max(finalValue, MinValue)
+	if UseMaxValue:
+		finalValue = min(finalValue, MaxValue)
+	return finalValue
 
 func CalcRawValue(args : Array[String]) -> float:
 	var addValue : int = 0
-	
-	for modifierKey : String in modifiers.keys():
-		if modifierKey in args:
-			continue
-		
-		if modifiers[modifierKey][1] == false:
-			addValue += modifiers[modifierKey][0]
-	
-	var finalValue : float = BaseValue + addValue
-	
+	var finalMultiplier : float = 1.0
+
 	for modifierKey in modifiers.keys():
-		if modifiers[modifierKey][1] == true:
-			finalValue *= 1 + modifiers[modifierKey][0]
+		var modifierData = modifiers[modifierKey]
+		
+		if modifierKey not in args:
+			if not modifierData[1]:
+				addValue += modifierData[0]
+			else:
+				finalMultiplier *= 1 + modifierData[0]
 	
-	return round(finalValue)
+	return round((BaseValue + addValue) * finalMultiplier)
