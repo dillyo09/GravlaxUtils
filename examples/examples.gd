@@ -1,6 +1,5 @@
 extends Node2D
 
-
 func _ready() -> void:
 	var stat : Vector4Stat = Vector4Stat.new()
 	stat.BaseValue = Vector4(5, 3, 10, 8)
