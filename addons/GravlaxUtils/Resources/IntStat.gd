@@ -6,11 +6,24 @@ class_name IntStat extends StatBase
 @export var MaxValue : int = 0
 @export var UseMaxValue : bool = false
 
-func GetValue(args : Array[String] = []) -> int:
-	return CalcValue(args)
+var cachedValue : int = NAN
+var cachedRawValue : int = NAN
 
-func GetRawValue(args : Array[String] = []) -> int:
-	return CalcRawValue(args)
+func _set(property : StringName, value : Variant) -> bool:
+	if property != "cachedValue" || property != "cachedRawValue":
+		cachedValue = NAN
+		cachedRawValue = NAN
+	return false
+
+func GetValue() -> int:
+	if CheckNan(cachedValue):
+		cachedValue = CalcValue()
+	return cachedValue 
+
+func GetRawValue() -> int:
+	if CheckNan(cachedRawValue):
+		cachedRawValue = CalcRawValue()
+	return cachedRawValue
 	
 func Mod(key : String, value : float, precentage : bool) -> void:
 	if Registered(key):
@@ -18,16 +31,19 @@ func Mod(key : String, value : float, precentage : bool) -> void:
 		modifiers[key][1] = precentage
 	else:
 		Register(key, value, precentage)
+	
+	cachedRawValue = NAN
+	cachedValue = NAN
 
-func CalcValue(args : Array[String]) -> float:
-	var finalValue : int = CalcRawValue(args)
+func CalcValue(args : Array[String] = []) -> float:
+	var finalValue: float = CalcRawValue(args)
 	if UseMinValue:
 		finalValue = max(finalValue, MinValue)
 	if UseMaxValue:
 		finalValue = min(finalValue, MaxValue)
 	return finalValue
 
-func CalcRawValue(args : Array[String]) -> float:
+func CalcRawValue(args : Array[String] = []) -> float:
 	var addValue : int = 0
 	var finalMultiplier : float = 1.0
 
@@ -39,5 +55,12 @@ func CalcRawValue(args : Array[String]) -> float:
 				addValue += modifierData[0]
 			else:
 				finalMultiplier *= 1 + modifierData[0]
-	
+
 	return round((BaseValue + addValue) * finalMultiplier)
+
+# CheckNan exists because is_nan doesn't work well with int, in Godot due to a bug
+func CheckNan(number : int) -> bool:
+	if number == -9223372036854775808:
+		return true
+	
+	return is_nan(number)

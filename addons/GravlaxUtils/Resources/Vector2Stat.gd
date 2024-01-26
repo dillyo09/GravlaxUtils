@@ -6,11 +6,24 @@ class_name Vector2Stat extends StatBase
 @export var MaxValue : Vector2 = Vector2.ZERO
 @export var UseMaxValue : bool = false
 
-func GetValue(args : Array[String] = []) -> Vector2:
-	return CalcValue(args)
+var cachedValue : Vector2 = Vector2(NAN, NAN)
+var cachedRawValue : Vector2 = Vector2(NAN, NAN)
 
-func GetRawValue(args : Array[String] = []) -> Vector2:
-	return CalcRawValue(args)
+func _set(property : StringName, value : Variant) -> bool:
+	if property != "cachedValue" || property != "cachedRawValue":
+		cachedValue = Vector2(NAN, NAN)
+		cachedRawValue = Vector2(NAN, NAN)
+	return false
+
+func GetValue() -> Vector2:
+	if is_nan(cachedValue.x):
+		cachedValue = CalcValue()
+	return cachedValue 
+
+func GetRawValue() -> Vector2:
+	if is_nan(cachedRawValue.x):
+		cachedRawValue = CalcRawValue()
+	return cachedRawValue
 	
 func Mod(key : String, value : Vector2, precentage : bool) -> void:
 	if Registered(key):
@@ -18,19 +31,22 @@ func Mod(key : String, value : Vector2, precentage : bool) -> void:
 		modifiers[key][1] = precentage
 	else:
 		Register(key, value, precentage)
+	
+	cachedValue = Vector2(NAN, NAN)
+	cachedRawValue = Vector2(NAN, NAN)
 
 func ModScalar(key : String, value : float, precentage : bool) -> void:
 	Mod(key, Vector2(value, value), precentage)
 
-func CalcValue(args : Array[String]) -> Vector2:
-	var finalValue : Vector2 = CalcRawValue(args)
+func CalcValue(args : Array[String] = []) -> Vector2:
+	var finalValue: Vector2 = CalcRawValue(args)
 	if UseMinValue:
 		finalValue = max(finalValue, MinValue)
 	if UseMaxValue:
 		finalValue = min(finalValue, MaxValue)
 	return finalValue
 
-func CalcRawValue(args : Array[String]) -> Vector2:
+func CalcRawValue(args : Array[String] = []) -> Vector2:
 	var addValue : Vector2 = Vector2.ZERO
 	var finalMultiplier : Vector2 = Vector2.ONE
 
@@ -44,3 +60,4 @@ func CalcRawValue(args : Array[String]) -> Vector2:
 				finalMultiplier *= Vector2.ONE + modifierData[0]
 
 	return (BaseValue + addValue) * finalMultiplier
+

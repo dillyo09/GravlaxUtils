@@ -2,10 +2,16 @@ class_name StatBase extends Resource
 
 var modifiers : Dictionary
 
-func GetValue(args : Array[String]) -> Variant:
+func GetValue() -> Variant:
 	return null
 
-func GetRawValue(args : Array[String]) -> Variant:
+func GetRawValue() -> Variant:
+	return null
+
+func CalcValue(args : Array[String] = []) -> Variant:
+	return null
+
+func CalcRawValue(args: Array[String] = []) -> Variant:
 	return null
 	
 func TryGetValue(key : String) -> Variant:

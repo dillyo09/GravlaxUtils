@@ -6,11 +6,24 @@ class_name FloatStat extends StatBase
 @export var MaxValue : float = 0
 @export var UseMaxValue : bool = false
 
-func GetValue(args : Array[String] = []) -> float:
-	return CalcValue(args)
+var cachedValue : float = NAN
+var cachedRawValue : float = NAN
 
-func GetRawValue(args : Array[String] = []) -> float:
-	return CalcRawValue(args)
+func _set(property : StringName, value : Variant) -> bool:
+	if property != "cachedValue" || property != "cachedRawValue":
+		cachedValue = NAN
+		cachedRawValue = NAN
+	return false
+
+func GetValue() -> float:
+	if is_nan(cachedValue):
+		cachedValue = CalcValue()
+	return cachedValue 
+
+func GetRawValue() -> float:
+	if is_nan(cachedRawValue):
+		cachedRawValue = CalcRawValue()
+	return cachedRawValue
 	
 func Mod(key : String, value : float, precentage : bool) -> void:
 	if Registered(key):
@@ -18,8 +31,11 @@ func Mod(key : String, value : float, precentage : bool) -> void:
 		modifiers[key][1] = precentage
 	else:
 		Register(key, value, precentage)
+	
+	cachedRawValue = NAN
+	cachedValue = NAN
 
-func CalcValue(args : Array[String]) -> float:
+func CalcValue(args : Array[String] = []) -> float:
 	var finalValue: float = CalcRawValue(args)
 	if UseMinValue:
 		finalValue = max(finalValue, MinValue)
@@ -27,7 +43,7 @@ func CalcValue(args : Array[String]) -> float:
 		finalValue = min(finalValue, MaxValue)
 	return finalValue
 
-func CalcRawValue(args : Array[String]) -> float:
+func CalcRawValue(args: Array[String] = []) -> float:
 	var addValue : float = 0.0
 	var finalMultiplier : float = 1.0
 
