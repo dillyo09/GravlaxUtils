@@ -10,7 +10,7 @@ var cachedValue : int = NAN
 var cachedRawValue : int = NAN
 
 func _set(property : StringName, value : Variant) -> bool:
-	if property != "cachedValue" || property != "cachedRawValue":
+	if property != "cachedValue" && property != "cachedRawValue":
 		cachedValue = NAN
 		cachedRawValue = NAN
 	return false

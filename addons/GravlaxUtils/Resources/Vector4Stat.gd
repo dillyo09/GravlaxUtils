@@ -10,7 +10,7 @@ var cachedValue : Vector4 = Vector4(NAN, NAN, NAN, NAN)
 var cachedRawValue : Vector4 = Vector4(NAN, NAN, NAN, NAN)
 
 func _set(property : StringName, value : Variant) -> bool:
-	if property != "cachedValue" || property != "cachedRawValue":
+	if property != "cachedValue" && property != "cachedRawValue":
 		cachedValue = Vector4(NAN, NAN, NAN, NAN)
 		cachedRawValue = Vector4(NAN, NAN, NAN, NAN)
 	return false
